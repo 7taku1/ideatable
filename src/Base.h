@@ -11,13 +11,10 @@ private:
 public:
     Base(ofxTuioObject * _tuioObject);
     Base(){};
-    ~Base();
+    ~Base(){};
     int getFiducialId();
     float getX();
     float getY();
-    //add sound
-    ofSoundPlayer music;
-    float vol;
 
     void draw();
     void update(ofxTuioObject * _tuioObject);

@@ -6,20 +6,11 @@ Base::Base(ofxTuioObject * _tuioObject) {
     //オブジェクトのIDで条件分岐
     x=_tuioObject->getX();
     y=_tuioObject->getY();
-    //load musicfile
-    music.loadSound("sounds/stillalive.mp3");
-    music.setMultiPlay(true);
-    music.setVolume(vol=0.5);    //set music vol
     if(_tuioObject->getFiducialId()<SAMPLE_NUM) {
         FID=_tuioObject->getFiducialId();
         sample.update(_tuioObject);
         index=1;//上から順番に番号をふる
     }
-    if(FID==30)music.play();//とりま30番でやってみる
-}
-
-Base::~Base(){
-    music.stop();
 }
 
 //マーカーIDの取得
@@ -41,9 +32,6 @@ void Base::draw() {
 void Base::update(ofxTuioObject * _tuioObject) {
     x=_tuioObject->getX();
     y=_tuioObject->getY();
-    //change music vol
-    vol=_tuioObject->getAngle()/(2.0*3.14159265358979);
-    music.setVolume(vol);
     //draw()と同様に
     switch(index) {
     case 1:
