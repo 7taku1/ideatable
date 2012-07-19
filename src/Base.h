@@ -10,11 +10,15 @@ private:
     float x,y;
 public:
     Base(ofxTuioObject * _tuioObject);
-    Base() {};
-    ~Base() {};
+    Base(){};
+    ~Base();
     int getFiducialId();
     float getX();
     float getY();
+    //add sound
+    ofSoundPlayer music;
+    float vol;
+
     void draw();
     void update(ofxTuioObject * _tuioObject);
     bool isActionRange(ofxTuioCursor * _tuioCursor);
