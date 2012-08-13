@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxTuio.h"
-#include "Base.h"
 #include "line\line.h"
 #include "map"
 #include "string"
@@ -33,12 +32,11 @@ public:
     void tuioUpdated(ofxTuioCursor & tuioCursor);
 
 private:
-    map<int,Base> objects;
-    map<int,Base>::iterator obj_itr;
+    map<int,ofxTuioObject> objects;
+    map<int,ofxTuioObject>::iterator obj_itr;
     map<int,int> prevStatus;
     vector<objLine> lines;
     vector<objLine>::iterator line_itr;
     myTuioClient tuio;
     string log;
-    bool showLogFlag;
 };

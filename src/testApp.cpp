@@ -14,7 +14,6 @@ void testApp::setup() {
     //3333番ポートで通信開始
     tuio.start(3333);
     log="";
-    showLogFlag=false;
 }
 //--------------------------------------------------------------
 void testApp::update() {
@@ -25,28 +24,27 @@ void testApp::update() {
 void testApp::draw() {
     obj_itr=objects.begin();
     ofEnableAlphaBlending();
-    while(obj_itr != objects.end()) {
-        (*obj_itr).second.draw();
-        obj_itr++;
-    }
     ofSetColor(0,0,0,50);
     ofRect(0,0,ofGetWidth(),ofGetHeight());
-    ofSetColor(0xffffff);
-    if(showLogFlag==true)ofDrawBitmapString(log,20,20);
+    #ifdef DEBUG
+    ofDrawBitmapString(log,20,20);
+    #endif
     ofDisableAlphaBlending();
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key) {
-    //'l'キーでログ表示
-    if(key==108&&showLogFlag==false)showLogFlag=true;
-    else if(key==108)showLogFlag=false;
+    #ifdef DEBUG
     log="Key Pressed : keycode:"+ofToString(key);
+    #endif
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key) {
+    #ifdef DEBUG
     log="Key Released : keycode:"+ofToString(key);
+    ofLog()<<"Key Released : keycode:"<<key;
+    #endif
 }
 
 //--------------------------------------------------------------
@@ -91,9 +89,8 @@ void testApp::dragEvent(ofDragInfo dragInfo) {
 }
 
 void testApp::objectAdded(ofxTuioObject & tuioObject) {
-    const Base obj(&tuioObject);
-    objects.insert(map<int,Base>::value_type(tuioObject.getFiducialId(),
-                   obj));
+    objects.insert(map<int,ofxTuioObject>::value_type(tuioObject.getFiducialId(),
+                   tuioObject));
     log="New Object: "+ofToString(tuioObject.getFiducialId())+
         " X: "+ofToString(tuioObject.getX())+
         " Y: "+ofToString(tuioObject.getY());
@@ -124,55 +121,18 @@ void testApp::objectUpdated(ofxTuioObject & tuioObject) {
 }
 
 void testApp::tuioAdded(ofxTuioCursor & tuioCursor) {
-    int t=-1;
-    for(obj_itr=objects.begin();obj_itr!=objects.end();obj_itr++) {
-        if((*obj_itr).second.isRange(&tuioCursor)) {
-            if((*obj_itr).second.isActionRange(&tuioCursor)) {
-                (*obj_itr).second.touchAction(&tuioCursor);
-            } else
-                t=(*obj_itr).second.getFiducialId();
-        }
-    }
-    prevStatus.insert(map<int,int>::value_type(tuioCursor.getFingerId(),
-                                               t));
     log="New Cursor: "+ofToString(tuioCursor.getFingerId())+
         " X: "+ofToString(tuioCursor.getX())+
         " Y: "+ofToString(tuioCursor.getY());
 }
 
 void testApp::tuioRemoved(ofxTuioCursor & tuioCursor) {
-    //lineと関連があった場合該当するLineを削除
-    for(line_itr=lines.begin();line_itr!=lines.end();line_itr++){
-        if((*line_itr).getCursorID()==tuioCursor.getFingerId())
-            lines.erase(line_itr);
-    }
-    prevStatus.erase(tuioCursor.getFingerId());
     log="Cursor Removed: "+ofToString(tuioCursor.getFingerId())+
         " X: "+ofToString(tuioCursor.getX())+
         " Y: "+ofToString(tuioCursor.getY());
 }
 
 void testApp::tuioUpdated(ofxTuioCursor & tuioCursor) {
-    for(line_itr=lines.begin();line_itr!=lines.end();line_itr++) {
-        if((*line_itr).getCursorID()==tuioCursor.getFingerId()){
-            (*line_itr).update(&tuioCursor);
-        }
-    }
-    for(obj_itr=objects.begin();obj_itr!=objects.end();obj_itr++) {
-        if((*obj_itr).second.isRange(&tuioCursor)) {
-            if(prevStatus[tuioCursor.getFingerId()]==-1)
-                (*line_itr).lineEnd(&(*obj_itr).second.getObject());
-            else if((*obj_itr).second.isActionRange(&tuioCursor)) 
-                (*obj_itr).second.touchAction(&tuioCursor);
-            prevStatus[tuioCursor.getFingerId()]=
-                (*obj_itr).second.getFiducialId();
-        }
-    }
-    if(prevStatus[tuioCursor.getFingerId()]==-1) {
-        objLine l(&objects[prevStatus[tuioCursor.getFingerId()]].getObject(),
-                  &tuioCursor);
-        lines.push_back(l);
-    }
     log="Cursor Updated: "+ofToString(tuioCursor.getFingerId())+
         " X: "+ofToString(tuioCursor.getX())+
         " Y: "+ofToString(tuioCursor.getY());
